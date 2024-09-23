@@ -12,11 +12,12 @@
 - [Config](#config)
   - [Config Structure](#config-structure)
   - [inlineSource Properties](#inlinesource-properties)
-  - [Example File to Pair with componentCode](#example-file-to-pair-with-componentcode)
   - [Other Config Options](#other-config-options)
     - [silent](#silent)
     - [swcrcPath](#swcrcpath)
     - [uglifyConfig](#uglifyconfig)
+- [Target File Example](#target-file-example)
+- [Testing](#testing)
 
 ## Why use inline-src?
 
@@ -107,39 +108,6 @@ Example:
 ```
 
 Note: Be aware of proper escape sequences for special characters including new line characters as illustrated above. It is also highly recommended to place [inline-src_contents], and therefore the output of the minified contents, inside a template literal with ` backticks surrounding the content, otherwise your minified code will have a high likelihood of sequence failure or corruption in use.
-
-### Example file to Pair with componentCode
-
-A file like the following can contain the output of all the final printed inline source, and be used for mapping all the locations of the matching `"pattern"` and `"componentCode"` values. It is not necessary to place all into a single file as shown here, and inline-src allows for flexibility to do otherwise. However, this pattern as shown is clean, allowing this document to subsequently be imported into other files to place the contents into position during overall compilation as needed.
-
-
-```ts
-//./components/InlineSrc/InlineSrc.ts before running inline-src
-export function GlobalInlineStyle() {
-    return ``;
-    // End GlobalInlineStyle.
-}
-
-export function LayoutInlineJS() {
-    return ``;
-    // End LayoutInlineJS.
-}
-```
-
-Even after values have been placed into the position between the backticks, the regex and token as defined will continue to locate and replace the contents correctly.
-
-```ts
-//./components/InlineSrc/InlineSrc.ts after running inline-src
-export function GlobalInlineStyle() {
-    return `body {background: #000; color: #fff;}`;
-    // End GlobalInlineStyle.
-}
-
-export function LayoutInlineJS() {
-    return `console.log("hello world!");`;
-    // End LayoutInlineJS.
-}
-```
 
 `"uglifyConfig"`
 
@@ -233,3 +201,66 @@ By default, without a custom config provided, the only option used by `inline-sr
 Be aware the `inline-src` package will only validate the placement of your config file. It will be up to uglify-js and to you the user to validate and provide a functioning uglify-js config file.
 
 See the [uglify-js documentation](https://www.npmjs.com/package/uglify-js) for more details.
+
+## Target File Example
+
+A file like the following can contain the output of all the final printed inline source, and be used for mapping all the locations of the matching `"pattern"` and `"componentCode"` values. It is not necessary to place all into a single file as shown here, and inline-src allows for flexibility to do otherwise. However, this pattern as shown is clean, allowing this document to subsequently be imported into other files to place the contents into position during overall compilation as needed.
+
+
+```ts
+//./components/InlineSrc/InlineSrc.ts before running inline-src
+export function GlobalInlineStyle() {
+    return ``;
+    // End GlobalInlineStyle.
+}
+
+export function LayoutInlineJS() {
+    return ``;
+    // End LayoutInlineJS.
+}
+```
+
+Even after values have been placed into the position between the backticks, the regex and token as defined will continue to locate and replace the contents correctly.
+
+```ts
+//./components/InlineSrc/InlineSrc.ts after running inline-src
+export function GlobalInlineStyle() {
+    return `body {background: #000; color: #fff;}`;
+    // End GlobalInlineStyle.
+}
+
+export function LayoutInlineJS() {
+    return `console.log("hello world!");`;
+    // End LayoutInlineJS.
+}
+```
+
+## Testing
+
+To run unit and integration tests on the source code:
+
+```bash
+npm run test
+```
+
+The respository is configured with [Vitest](https://vitest.dev/).
+
+The config file the tests use is found in the root at `./inline-src.config.ts`, as is the swc config at `./.swcrc`. These are the only persistent files aside from the vitest config, source code, and test files themselves which the tests rely on. All files that are manipulated in the file system are handled using [`fs-mock`](https://www.npmjs.com/package/mock-fs) and creation of these files' contents are managed within the test functions.
+
+Each test that needs to test content on the file system creates content in the mocked file system, but does so reading the real config file, simultaneously performing an integration test with the config file, and a unit test on the function in question. Each piece of content is mapped to a path, pattern, or string defined either in the config file or in the mock as in this example:
+
+```js
+beforeAll(() => {
+        mockFs({
+            [config.inlineSource[0].assetPath]: 'body {background: #000;color: #fff;}',
+            [config.inlineSource[0].componentPath]: `import * as fs  from "fs"
+            export default function ThisComponent({someProps} : any) {
+                const foo = "bar";
+                return \`\`;
+                // End MyComponentInlineCSS.
+            }`
+        });
+    });
+```
+
+When the test runs, the mocked content is read by just as if it were the true file system. After each use of the mocked file system, it is reset using `mockFs.restore()`.

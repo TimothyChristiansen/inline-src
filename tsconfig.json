@@ -4,7 +4,7 @@
       "declaration": true,
       "emitDeclarationOnly": true,
       "outDir": "./dist/src",
-      "rootDir": "./src",
+      "rootDir": "./",
       "declarationDir": "./dist/src",
       "module": "esnext",
       "noEmit": false,

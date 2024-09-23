@@ -1,5 +1,4 @@
 export interface InlineSource {
-    type: string;
     assetPath: string;
     componentPath: string;
     pattern: string;

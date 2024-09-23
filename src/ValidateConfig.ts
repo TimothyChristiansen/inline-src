@@ -58,7 +58,7 @@ function validateInlineSourceKeys(config : Config, item : InlineSource, index : 
 function loadConfig(filePath : string) {
     const configContents = fs.readFileSync(filePath).toString();
     try {
-        let stringified = configContents.toString().split(/module.exports\s*?=\s*?\s*?|config\s*?=\s*?/)[1];
+        let stringified = configContents.toString().split(/module.exports\s*?=\s*?\s*?|[cC]onfig\s*?=\s*?/)[1];
         stringified = stringified.replaceAll(/(?<!\\)\\n|(?<!\\)\\r/g, "").replace(/(\w+)\s*?:/g,'"$1":');
         const config = JSON.parse(stringified);
         return config;
