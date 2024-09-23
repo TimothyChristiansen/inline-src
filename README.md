@@ -36,7 +36,7 @@ npm install -D inline-src
 
 Add `inline-src` to your package scripts (replace `devprocess` and `buildprocess` with your specific framework process):
 
-```json
+```js
 //
 "scripts" : {
     //
@@ -58,7 +58,7 @@ The config requires an array of `"inlineSource"` elements, each defining paramet
 
 Example:
 
-```json
+```js
 {
     "inlineSource" : [
         {
@@ -206,7 +206,7 @@ Example path: `./inline-src/.swcrc`
 
 Default example .swcrc when using typescript:
 
-```json
+```js
 {
     "jsc": {
       "parser": {
