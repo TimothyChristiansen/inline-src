@@ -130,11 +130,15 @@ describe("ValidateConfig", () => {
         }`
     }
 
+    let standardSetup = true;
+
     beforeEach(() => {
         errConfig = JSON.parse(Config);
-        let {inlineSource, ...rest} = errConfig;
-        inlineSource.splice(1);
-        errConfig = {inlineSource, ...rest};
+        if(standardSetup === true) {
+            let {inlineSource, ...rest} = errConfig;
+            inlineSource.splice(1);
+            errConfig = {inlineSource, ...rest};
+        }
     })
 
     afterAll(() => {
@@ -182,7 +186,6 @@ describe("ValidateConfig", () => {
             './inline-src.config.json' : `${errConfig}`,
             ...setupMocks
         })
-        console.log("assetPath test")
         expect(() => ValidateConfig()).toThrow(`inline-src: Invalid config - Missing key "assetPath" at config index 0.`);
     })
 
@@ -240,6 +243,55 @@ describe("ValidateConfig", () => {
             './inline-src.config.json' : `${errConfig}`,
             [newPath] : "content"
         })
-        expect(() => ValidateConfig()).toThrow(`inline-src: File "./test_work/invalid_extention.txt" at config index 0 is not a valid compilable file type (.css, .scss, .js, or .ts).`);
+        expect(() => ValidateConfig()).toThrow(`inline-src: File "./test_work/invalid_extention.txt" at config index 0 is not a valid compilable file type (.css, .scss, .js, .mjs, .ts, or .mts).`);
+        standardSetup = false;
+    })
+
+    it("throws an error if the file type is js but the config for the swcrc path is undefined", () => {
+        let {inlineSource, ...rest} = errConfig;
+        inlineSource = inlineSource.splice(2,1);
+        errConfig = {inlineSource, ...rest};
+        let {swcrcPath, ...swcrcRest} = errConfig;
+        errConfig = {...swcrcRest};
+        errConfig = JSON.stringify(errConfig);
+        mockFs({
+            './inline-src.config.json' : `${errConfig}`,
+            './test_work/layout.ts' : 'placeholder'
+        })
+        expect(() => ValidateConfig()).toThrow(`inline-src: File "./test_work/layout.ts" at config index 0 is a TypeScript file, but "swcrcPath" was undefined.`);
+    })
+
+    it("throws an error if the file type is js but the config for the swcrc path is unresolved", () => {
+        let {inlineSource, ...rest} = errConfig;
+        inlineSource = inlineSource.splice(2,1);
+        errConfig = {inlineSource, ...rest};
+        errConfig = JSON.stringify(errConfig);
+        mockFs({
+            './inline-src.config.json' : `${errConfig}`,
+            './test_work/layout.ts' : 'placeholder'
+        })
+        expect(() => ValidateConfig()).toThrow(`inline-src: File "./test_work/layout.ts" at config index 0 is a TypeScript file, but path to .swcrc file from config was unresolved.`);
+    })
+
+    it("throws an error if the file type is js but the config for the swcrc path is unresolved", () => {
+        let {inlineSource, ...rest} = errConfig;
+        inlineSource = inlineSource.splice(2,1);
+        errConfig = {inlineSource, ...rest};
+        errConfig = JSON.stringify(errConfig);
+        mockFs({
+            './inline-src.config.json' : `${errConfig}`,
+            './test_work/layout.ts' : 'placeholder'
+        })
+        expect(() => ValidateConfig()).toThrow(`inline-src: File "./test_work/layout.ts" at config index 0 is a TypeScript file, but path to .swcrc file from config was unresolved.`);
+        standardSetup = true;
+    })
+
+    it("throws an error if the file for componentPath is not resolved", () => {
+        errConfig = JSON.stringify(errConfig);
+        mockFs({
+            './inline-src.config.json' : `${errConfig}`,
+            [config.inlineSource[0].assetPath] : 'placeholder'
+        })
+        expect(() => ValidateConfig()).toThrow(`inline-src: Invalid config - File "./test_work/InlineSrc.ts" for "componentPath" at config index 0 does not exist.`);
     })
 })

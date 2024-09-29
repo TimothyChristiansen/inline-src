@@ -14,13 +14,15 @@ function validateInlineSourceKeys(config : Config, item : InlineSource, index : 
                     throw new Error(`inline-src: Invalid config - File "${item[key]}" for "${key}" at config index ${index} does not exist.`);
                 }
                 const type = item.assetPath.substring(item.assetPath.lastIndexOf("."));
-                if(type !== ".css" && type !== ".scss" && type !== ".js" && type !== ".ts") {
-                    throw new Error(`inline-src: File "${item[key]}" at config index ${index} is not a valid compilable file type (.css, .scss, .js, or .ts).`)
+                const validTypes = [".css", ".scss", ".js", ".mjs", ".ts", ".mts"];
+                if(!validTypes.includes(type)) {
+                    throw new Error(`inline-src: File "${item[key]}" at config index ${index} is not a valid compilable file type (.css, .scss, .js, .mjs, .ts, or .mts).`)
                 }
-                if(item.assetPath.indexOf(".ts") !== -1 && typeof config.swcrcPath === "undefined") {
-                    throw new Error(`inline-src: File "${item[key]}" at config index ${index} is a TypeScript file, but path to .swcrc file not found in config.`);
+                const jsTypes = [".js", ".mjs", ".ts", ".mts"];
+                if(jsTypes.includes(type) && typeof config.swcrcPath === "undefined") {
+                    throw new Error(`inline-src: File "${item[key]}" at config index ${index} is a TypeScript file, but "swcrcPath" was undefined.`);
                 }
-                if(item.assetPath.indexOf(".ts") !== -1 && !fs.existsSync(config.swcrcPath)) {
+                if(jsTypes.includes(type) && !fs.existsSync(config.swcrcPath)) {
                     throw new Error(`inline-src: File "${item[key]}" at config index ${index} is a TypeScript file, but path to .swcrc file from config was unresolved.`);
                 }
                 break;
