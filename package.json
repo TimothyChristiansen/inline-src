@@ -10,7 +10,7 @@
     "inline-src": "./dist/inline-src.js"
   },
   "scripts": {
-    "test": "vitest",
+    "test": "vitest --coverage",
     "build": "webpack --mode production"
   },
   "author": "Timothy Christiansen <timothy.christiansen@proton.me>",
@@ -25,6 +25,7 @@
     "uglify-js": "^3.19.3"
   },
   "devDependencies": {
+    "@vitest/coverage-istanbul": "^2.1.1",
     "mock-fs": "^5.2.0",
     "vitest": "^2.0.5",
     "webpack": "^5.94.0",

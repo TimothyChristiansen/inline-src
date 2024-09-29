@@ -1,0 +1,30 @@
+{
+    "inlineSource": [
+        {
+            "assetPath" : "./test_work/globals.scss",
+            "componentPath" : "./test_work/InlineSrc.ts",
+            "pattern" : "return `.*?`;\\s*\/\/ End MyComponentInlineCSS.",
+            "componentCode" : "return `[inline-src_contents]`;\\n                // End MyComponentInlineCSS."
+        },
+        {
+            "assetPath" : "./test_work/other.css",
+            "componentPath" : "./test_work/InlineSrc2.ts",
+            "pattern" : "return `.*?`;\\s*\/\/ End OtherInlineCSS.",
+            "componentCode" : "return `[inline-src_contents]`;\\n            // End OtherInlineCSS."
+        },
+        {
+            "assetPath" : "./test_work/layout.ts",
+            "componentPath" : "./test_work/InlineSrc3.ts",
+            "pattern" : "return `.*?`;\\s*\/\/ End LayoutInlineJS.",
+            "componentCode" : "return `[inline-src_contents]`;\\n            // End LayoutInlineJS."
+        },
+        {
+            "assetPath" : "./test_work/other.ts",
+            "componentPath" : "./test_work/InlineSrc4.ts",
+            "pattern" : "return `.*?`;\\s*\/\/ End OtherInlineJS.",
+            "componentCode" : "return `[inline-src_contents]`;\\n            // End OtherInlineJS."
+        }
+    ],
+    "swcrcPath": "./test_work/inline-src/.swcrc",
+    "silent": "true"
+}

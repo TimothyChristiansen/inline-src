@@ -5,7 +5,7 @@ function validateInlineSourceKeys(config : Config, item : InlineSource, index : 
     const keys = ["assetPath", "componentPath", "pattern", "componentCode"];
     keys.forEach(key => {
         const Key = item[key as keyof InlineSource];
-        if(Key === "undefined") {
+        if(Key === undefined) {
             throw new Error(`inline-src: Invalid config - Missing key "${key}" at config index ${index}.`);
         }
         switch(key) {
@@ -44,8 +44,8 @@ function validateInlineSourceKeys(config : Config, item : InlineSource, index : 
                 if(typeof item[key] !== "string") {
                     throw new Error(`inline-src: Invalid config - Invalid object found for "${key}" at config index ${index}.`);
                 }
-                if(item[key].indexOf("[inlinesrc_contents]") === -1) {
-                    throw new Error(`inline-src: Invalid config - [inlinesrc_contents] token not found for "${key}" at config index ${index}.`);
+                if(item[key].indexOf("[inline-src_contents]") === -1) {
+                    throw new Error(`inline-src: Invalid config - [inline-src_contents] token not found for "${key}" at config index ${index}.`);
                 }
                 break;
             default:
@@ -55,15 +55,18 @@ function validateInlineSourceKeys(config : Config, item : InlineSource, index : 
     })
 }
 
-function loadConfig(filePath : string) {
+export function loadConfig(filePath : string) {
     const configContents = fs.readFileSync(filePath).toString();
     try {
         let stringified = configContents.toString().split(/module.exports\s*?=\s*?\s*?|[cC]onfig\s*?=\s*?/)[1];
+        if(!stringified) {
+            stringified = configContents;
+        }
         stringified = stringified.replaceAll(/(?<!\\)\\n|(?<!\\)\\r/g, "").replace(/(\w+)\s*?:/g,'"$1":');
         const config = JSON.parse(stringified);
         return config;
     } catch (e) {
-        console.error("inline-src: Invalid config file.");
+        console.error(`inline-src: Invalid config file at ${filePath}. Please check for JSON syntax and string sequence errors.`);
         throw e;
     }
 }
@@ -74,13 +77,14 @@ export function findConfig() {
     const configFileExtension = extensions.filter(ext => fs.existsSync(`${configFilePathSansExt}${ext}`))[0];
     const configFilePath = `${configFilePathSansExt}${configFileExtension}`;
     if (fs.existsSync(configFilePath)) {
-        return loadConfig(configFilePath);
+        return configFilePath;
     }
     throw new Error("inline-src: Config file not found.");
 }
 
-export default function ValidateConfig() {
-    const config = findConfig();
+export function ValidateConfig() {
+    const configFilePath = findConfig();
+    const config = loadConfig(configFilePath);
     if (typeof config.inlineSource === "undefined") {
         throw new Error("inline-src: Config object for inlineSource is undefined.");
     }
@@ -88,7 +92,7 @@ export default function ValidateConfig() {
         throw new Error("inline-src: Config object for inlineSource is not an Array.")
     }
     if(!config.inlineSource.length) {
-        throw new Error("inline-src: Config object for inlineSource has no length.");
+        throw new Error("inline-src: Config object for inlineSource has 0 length.");
     }
     config.inlineSource.forEach((item : InlineSource, index : number) => {
         validateInlineSourceKeys(config, item, index);
