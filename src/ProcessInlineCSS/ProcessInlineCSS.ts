@@ -3,7 +3,7 @@ import * as fs from "fs"
 import {execSync} from "child_process"
 import UpdateInlineCode from "../UpdateInlineCode/UpdateInlineCode.ts"
 
-export default function ProcessInlineCSS(config : Config, item : InlineSource) {
+export function CompileCSS(config : Config, item : InlineSource) : void {
     if(item.assetPath && item.assetPath.indexOf(".scss") !== -1) {
         if(config.silent !== true && config.silent !== "true") {
             console.log(`inline-src: ${item.assetPath} - Compiling SASS...`);
@@ -12,6 +12,9 @@ export default function ProcessInlineCSS(config : Config, item : InlineSource) {
     } else {
         fs.writeFileSync("./inline-src_work/file.css",fs.readFileSync(item.assetPath));
     }
+}
+
+export function MinifyCSS(config : Config, item : InlineSource) {
     if(config.silent !== true && config.silent !== "true") {
         console.log("inline-src: Minifying working CSS file with minify-css...");
     }
