@@ -36,11 +36,11 @@ export function ProcessInlineCode(config : Config) : void {
     config.inlineSource.forEach((item : InlineSource) => {
         const extension = item.assetPath.substring(item.assetPath.lastIndexOf("."));
         if(extension.match(/\.m?[jt]s/g)) {
-            processInlineCSS(config, item);
+            processInlineJS(config, item);
             UpdateInlineCode(config, item, "js");
         }
         if(extension.match(/\.s?css/g)) {
-            processInlineJS(config, item);
+            processInlineCSS(config, item);
             UpdateInlineCode(config, item, "css");
         }
     })
