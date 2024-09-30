@@ -1,7 +1,7 @@
-import {Config, InlineSource} from "./inline-src.config.ts"
+import {Config, InlineSource} from "../inline-src.config/inline-src.config.ts"
 import * as fs from "fs"
 import {execSync} from "child_process"
-import UpdateInlineCode from "./UpdateInlineCode.ts"
+import UpdateInlineCode from "../UpdateInlineCode/UpdateInlineCode.ts"
 
 export default function ProcessInlineCSS(config : Config, item : InlineSource) {
     if(item.assetPath && item.assetPath.indexOf(".scss") !== -1) {

@@ -1,11 +1,13 @@
-import {Config, InlineSource} from "./inline-src.config.ts"
-import ValidateConfig from "./ValidateConfig.ts"
-import ProcessInlineCSS from "./ProcessInlineCSS.ts"
-import ProcessInlineJS from "./ProcessInlineJS.ts"
+import {Config, InlineSource} from "../inline-src.config/inline-src.config.ts"
+import {FindConfig, LoadConfig} from "../ConfigUtils/ConfigUtils.ts"
+import {ValidateConfig} from "../ValidateConfig/ValidateConfig.ts"
+import ProcessInlineCSS from "../ProcessInlineCSS/ProcessInlineCSS.ts"
+import ProcessInlineJS from "../ProcessInlineJS/ProcessInlineJS.ts"
 import * as fs from "fs"
 
 export default function InlineSrc() {
-    const config : Config = ValidateConfig();
+    ValidateConfig();
+    const config : Config = LoadConfig(FindConfig());
     if(config.silent !== true && config.silent !== "true") {
         console.log("inline-src: Initializing...");
     }

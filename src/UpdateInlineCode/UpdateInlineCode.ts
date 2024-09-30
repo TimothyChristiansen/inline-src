@@ -1,4 +1,4 @@
-import {Config, InlineSource} from "./inline-src.config.ts"
+import {Config, InlineSource} from "../inline-src.config/inline-src.config.ts"
 import * as fs from "fs"
 
 export default function UpdateInlineCode(config : Config, minifiedFile : string, item : InlineSource) {

@@ -1,7 +1,7 @@
-import {Config, InlineSource} from "./inline-src.config.ts"
+import {Config, InlineSource} from "../inline-src.config/inline-src.config.ts"
 import {execSync} from "child_process"
 import * as fs from "fs"
-import UpdateInlineCode from "./UpdateInlineCode.ts"
+import UpdateInlineCode from "../UpdateInlineCode/UpdateInlineCode.ts"
 
 export default function ProcessInlineJS(config: Config, item: InlineSource) {
     if(config.silent !== true && config.silent !== "true") {

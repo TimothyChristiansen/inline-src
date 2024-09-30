@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest'
 import mockFs from 'mock-fs'
 import UpdateInlineCode from './UpdateInlineCode.ts'
-import config from '../inline-src.config.json'
+import config from '../../inline-src.config.json'
 import * as fs from 'fs'
 
 describe('UpdateInlineCode', () => {
