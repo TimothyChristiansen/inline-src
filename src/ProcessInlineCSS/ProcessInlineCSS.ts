@@ -1,7 +1,6 @@
 import {Config, InlineSource} from "../inline-src.config/inline-src.config.ts"
 import * as fs from "fs"
 import {execSync} from "child_process"
-import UpdateInlineCode from "../UpdateInlineCode/UpdateInlineCode.ts"
 
 export function CompileCSS(config : Config, item : InlineSource) : void {
     if(item.assetPath && item.assetPath.indexOf(".scss") !== -1) {
@@ -20,5 +19,4 @@ export function MinifyCSS(config : Config, item : InlineSource) {
     }
     execSync('npx css-minify -f ./inline-src_work/file.css -o ./inline-src_work', { stdio: "inherit" });
     const CSSMin = fs.readFileSync("./inline-src_work/file.min.css").toString();
-    UpdateInlineCode(config, CSSMin, item);
 }

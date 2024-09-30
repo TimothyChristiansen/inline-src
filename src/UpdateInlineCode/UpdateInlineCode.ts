@@ -1,7 +1,12 @@
 import {Config, InlineSource} from "../inline-src.config/inline-src.config.ts"
 import * as fs from "fs"
 
-export default function UpdateInlineCode(config : Config, minifiedFile : string, item : InlineSource) {
+type MinType = "css" | "js";
+
+export default function UpdateInlineCode(config : Config, item : InlineSource, minType : MinType) {
+
+    const minifiedFile = fs.readFileSync(`./inline-src_work/file.min.${minType}`).toString().replaceAll("`", "\\\`");
+
     const regex = new RegExp(item.pattern,'g');
 
     const componentCodeMatch = item.componentCode.replace(/\\n/g, "\n").replace(/\\t/g, "\t").replace(/\\\\/g, "\\").match(regex);
@@ -21,7 +26,7 @@ export default function UpdateInlineCode(config : Config, minifiedFile : string,
     inlineFileContents = inlineFileContents.replace(regex, componentCodeWithNewlines);
 
     if(config.silent !== true && config.silent !== "true") {
-        console.log(`inline-src: Placing minified ${item.assetPath} into ${item.componentPath} at specified pattern...`);
+        console.info(`inline-src: Placing minified ${item.assetPath} into ${item.componentPath} at specified pattern...`);
     }
     fs.writeFileSync(item.componentPath,inlineFileContents);
 }

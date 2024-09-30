@@ -3,9 +3,10 @@ import {FindConfig, LoadConfig} from "../ConfigUtils/ConfigUtils.ts"
 import {ValidateConfig} from "../ValidateConfig/ValidateConfig.ts"
 import {CompileCSS, MinifyCSS} from "../ProcessInlineCSS/ProcessInlineCSS.ts"
 import {CompileJS, MinifyJS} from "../ProcessInlineJS/ProcessInlineJS.ts"
+import UpdateInlineCode from "../UpdateInlineCode/UpdateInlineCode.ts"
 import * as fs from "fs"
 
-export function InitInlineSrc(config : Config) {
+export function InitInlineSrc(config : Config) : void {
     if(config.silent !== true && config.silent !== "true") {
         console.log("inline-src: Initializing...");
     }
@@ -14,27 +15,34 @@ export function InitInlineSrc(config : Config) {
     }
 }
 
-function processInlineCSS(config : Config, item : InlineSource) {
+function processInlineCSS(config : Config, item : InlineSource) : void {
     CompileCSS(config, item)
     MinifyCSS(config, item);
 }
 
-function processInlineJS(config : Config, item : InlineSource) {
+function processInlineJS(config : Config, item : InlineSource) : void {
     CompileJS(config, item);
     MinifyJS(config, item);
 }
 
-export function CleanupInlineSrc(config : Config) {
+export function CleanupInlineSrc(config : Config) : void {
     fs.rmSync("./inline-src_work", { recursive: true, force: true });
     if(config.silent !== true && config.silent !== "true") {
         console.log("inline-src: Complete!");
     }
 }
 
-export function ProcessInlineCode(config : Config) {
+export function ProcessInlineCode(config : Config) : void {
     config.inlineSource.forEach((item : InlineSource) => {
-        const type = item.assetPath.substring(item.assetPath.lastIndexOf("."));
-        type == ".css" || type == ".scss" ? processInlineCSS(config, item) : processInlineJS(config, item);
+        const extension = item.assetPath.substring(item.assetPath.lastIndexOf("."));
+        if(extension.match(/\.m?[jt]s/g)) {
+            processInlineCSS(config, item);
+            UpdateInlineCode(config, item, "js");
+        }
+        if(extension.match(/\.s?css/g)) {
+            processInlineJS(config, item);
+            UpdateInlineCode(config, item, "css");
+        }
     })
 }
 

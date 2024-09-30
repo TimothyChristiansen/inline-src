@@ -17,7 +17,6 @@ describe("ValidateConfig", () => {
         inlineSource[0].pattern = "[";
         errConfig = {inlineSource, ...rest}; 
         errConfig = JSON.stringify(config);
-        console.log(errConfig);
         mockFs({
             './inline-src.config.json' : `${errConfig}`,
             ...setupMocks

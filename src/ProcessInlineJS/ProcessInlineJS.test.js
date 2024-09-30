@@ -21,20 +21,22 @@ describe('CompileJS', () => {
 
     afterAll(() => {
         mockFs.restore();
+        vi.restoreAllMocks(); 
     })
 
-    /*
-    TODO: Need to mock out CompileJS child_process... refactor for unit tests, and move full test to integration/E2E test
     it('outputs compiled js file to expected temp file', () => {
+        vi.mock('child_process', () => ({
+            execSync: vi.fn(() => fs.writeFileSync("./inline-src_work/file.js", `console.log("hello world!")`)),
+        }));
         CompileJS(config, config.inlineSource[3]);
-        expect(fs.readFileSync("./inline-src_work/file.js")).toString().toBe(`console.log("hello world!")`);
-    })*/
+        expect(fs.readFileSync("./inline-src_work/file.js").toString()).toBe(`console.log("hello world!")`);
+    })
 
     it('displays console output for the CLI when config.silent is not true', () => {
 
         config.silent = "false";
 
-        const spy = vi.spyOn(console, 'log').mockImplementation(() => {});
+        const spy = vi.spyOn(console, 'info').mockImplementation(() => {});
 
         CompileJS(config, config.inlineSource[3]);
 
@@ -44,4 +46,6 @@ describe('CompileJS', () => {
 
         spy.mockRestore();
     })
+
+    //it('minifies js at work file path')
 });

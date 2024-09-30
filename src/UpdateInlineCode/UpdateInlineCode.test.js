@@ -7,6 +7,8 @@ import * as fs from 'fs'
 describe('UpdateInlineCode', () => {
     beforeAll(() => {
         mockFs({
+            "./inline-src_work/file.min.css" : 'body {background: #000;color: #fff;}',
+            "./inline-src_work/file.min.js" : 'console.log("hello world!);',
             [config.inlineSource[0].assetPath]: 'body {background: #000;color: #fff;}',
             [config.inlineSource[0].componentPath]: `import * as fs  from "fs"
             export default function ThisComponent({someProps} : any) {
@@ -14,7 +16,14 @@ describe('UpdateInlineCode', () => {
                 return \`\`;
                 // End MyComponentInlineCSS.
             }`,
-            [config.inlineSource[1].componentPath]: `Errant component code!`
+            [config.inlineSource[2].assetPath]: 'console.log("hello world!);',
+            [config.inlineSource[2].componentPath]: `import * as fs  from "fs"
+            export default function ThisComponent({someProps} : any) {
+                const foo = "bar";
+                return \`\`;
+                // End LayoutInlineJS.
+            }`,
+            [config.inlineSource[3].componentPath]: `Errant component code!`
         });
     })
 
@@ -22,30 +31,47 @@ describe('UpdateInlineCode', () => {
         mockFs.restore();
     })
 
-    const css = 'body {background: #000;color: #fff;}';
+    const css = 'body {background: #000;color: #fff;}'
 
-    const componentContents = `import * as fs  from "fs"
+    const cssComponentContents = `import * as fs  from "fs"
             export default function ThisComponent({someProps} : any) {
                 const foo = "bar";
                 return \`${css}\`;
                 // End MyComponentInlineCSS.
             }`;
+    
+    const js = 'console.log("hello world!);'
 
-    it('locates and replaces contents of file based on regex pattern', () => {
+    const jsComponentContents = `import * as fs  from "fs"
+            export default function ThisComponent({someProps} : any) {
+                const foo = "bar";
+                return \`${js}\`;
+                // End LayoutInlineJS.
+            }`
 
-        UpdateInlineCode(config, css, config.inlineSource[0]);
+    it('locates and replaces contents of file based on regex pattern when file type is "css"', () => {
+
+        UpdateInlineCode(config, config.inlineSource[0], "css");
 
         const result = fs.readFileSync(config.inlineSource[0].componentPath, 'utf-8');
-        expect(result).toBe(componentContents);
+        expect(result).toBe(cssComponentContents);
+    })
+
+    it('locates and replaces contents of file based on regex pattern when file type is "js"', () => {
+
+        UpdateInlineCode(config, config.inlineSource[2], "js");
+
+        const result = fs.readFileSync(config.inlineSource[2].componentPath, 'utf-8');
+        expect(result).toBe(jsComponentContents);
     })
 
     it('displays console output for the CLI when config.silent is not true', () => {
 
         config.silent = "false";
 
-        const spy = vi.spyOn(console, 'log').mockImplementation(() => {});
+        const spy = vi.spyOn(console, 'info').mockImplementation(() => {});
 
-        UpdateInlineCode(config,css,config.inlineSource[0]);
+        UpdateInlineCode(config, config.inlineSource[0], "css");
 
         expect(spy).toHaveBeenCalledWith('inline-src: Placing minified ./test_work/globals.scss into ./test_work/InlineSrc.ts at specified pattern...');
 
@@ -56,9 +82,9 @@ describe('UpdateInlineCode', () => {
 
         config.silent = "true";
 
-        const spy = vi.spyOn(console, 'log').mockImplementation(() => {});
+        const spy = vi.spyOn(console, 'info').mockImplementation(() => {});
 
-        UpdateInlineCode(config,css,config.inlineSource[0]);
+        UpdateInlineCode(config, config.inlineSource[0], "css");
 
         expect(spy).toBeCalledTimes(0);
 
@@ -69,14 +95,14 @@ describe('UpdateInlineCode', () => {
 
         config.inlineSource[0].componentCode = "IncorrectComponentCode";
 
-        expect(() => UpdateInlineCode(config, css, config.inlineSource[0]))
+        expect(() => UpdateInlineCode(config, config.inlineSource[0], "css"))
         .toThrow(`inline-src: The pattern associated with "componentPath" : "./test_work/InlineSrc.ts" does not produce a match for "componentCode" : "IncorrectComponentCode"`);
     })
 
     it('throws an error if no match is found for the actual source code at item.componentPath', () => {
 
-        expect(() => UpdateInlineCode(config, css, config.inlineSource[1]))
-        .toThrow(`inline-src: The pattern associated with "componentPath" : "./test_work/InlineSrc2.ts" does not produce a match for the actual code found in the file.`);
+        expect(() => UpdateInlineCode(config, config.inlineSource[3], "css"))
+        .toThrow(`inline-src: The pattern associated with "componentPath" : "./test_work/InlineSrc4.ts" does not produce a match for the actual code found in the file.`);
         
     })
 });
