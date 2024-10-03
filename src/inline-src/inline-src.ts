@@ -8,7 +8,7 @@ import * as fs from "fs"
 
 export function InitInlineSrc(config : Config) : void {
     if(config.silent !== true && config.silent !== "true") {
-        console.log("inline-src: Initializing...");
+        console.info("inline-src: Initializing...");
     }
     if(!fs.existsSync("./inline-src_work")) {
         fs.mkdirSync("./inline-src_work");
@@ -53,5 +53,3 @@ export function InlineSrc() {
     ProcessInlineCode(config);
     CleanupInlineSrc(config);
 }
-
-InlineSrc();
