@@ -1,6 +1,4 @@
 import {Config, InlineSource} from "../inline-src.config/inline-src.config.ts"
-import {FindConfig, LoadConfig} from "../ConfigUtils/ConfigUtils.ts"
-import {ValidateConfig} from "../ValidateConfig/ValidateConfig.ts"
 import {CompileCSS, MinifyCSS} from "../ProcessInlineCSS/ProcessInlineCSS.ts"
 import {CompileJS, MinifyJS} from "../ProcessInlineJS/ProcessInlineJS.ts"
 import UpdateInlineCode from "../UpdateInlineCode/UpdateInlineCode.ts"
@@ -15,24 +13,24 @@ export function InitInlineSrc(config : Config) : void {
     }
 }
 
-function processInlineCSS(config : Config, item : InlineSource) : void {
-    CompileCSS(config, item)
-    MinifyCSS(config, item);
-}
-
-function processInlineJS(config : Config, item : InlineSource) : void {
-    CompileJS(config, item);
-    MinifyJS(config, item);
-}
-
 export function CleanupInlineSrc(config : Config) : void {
     fs.rmSync("./inline-src_work", { recursive: true, force: true });
     if(config.silent !== true && config.silent !== "true") {
-        console.log("inline-src: Complete!");
+        console.info("inline-src: Complete!");
     }
 }
 
 export function ProcessInlineCode(config : Config) : void {
+    function processInlineCSS(config : Config, item : InlineSource) : void {
+        CompileCSS(config, item)
+        MinifyCSS(config, item);
+    }
+    
+    function processInlineJS(config : Config, item : InlineSource) : void {
+        CompileJS(config, item);
+        MinifyJS(config, item);
+    }
+
     config.inlineSource.forEach((item : InlineSource) => {
         const extension = item.assetPath.substring(item.assetPath.lastIndexOf("."));
         if(extension.match(/\.m?[jt]s/g)) {
@@ -44,12 +42,4 @@ export function ProcessInlineCode(config : Config) : void {
             UpdateInlineCode(config, item, "css");
         }
     })
-}
-
-export function InlineSrc() {
-    ValidateConfig();
-    const config : Config = LoadConfig(FindConfig());
-    InitInlineSrc(config);
-    ProcessInlineCode(config);
-    CleanupInlineSrc(config);
 }

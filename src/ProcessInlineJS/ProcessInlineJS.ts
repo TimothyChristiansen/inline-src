@@ -1,7 +1,5 @@
 import {Config, InlineSource} from "../inline-src.config/inline-src.config.ts"
 import {execSync} from "child_process"
-import * as fs from "fs"
-
 
 export function CompileJS(config : Config, item : InlineSource) : void {
     if(config.silent !== true && config.silent !== "true") {
