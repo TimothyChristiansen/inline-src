@@ -20,7 +20,7 @@ export default function UpdateInlineCode(config : Config, item : InlineSource, m
     let inlineFileContents = fs.readFileSync(item.componentPath).toString();
 
     if(!inlineFileContents.match(regex)) {
-        throw new Error(`inline-src: The pattern associated with "componentPath" : "${item.componentPath}" does not produce a match for the actual code found in the file.`);
+        throw new Error(`inline-src: "pattern" : ${JSON.stringify(item.pattern)} and "componentCode" : ${JSON.stringify(item.componentCode)} values do not produce a match for the actual content found in "componentPath" : ${JSON.stringify(item.componentPath)}.`);
     }
 
     inlineFileContents = inlineFileContents.replace(regex, componentCodeWithNewlines);

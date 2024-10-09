@@ -240,7 +240,7 @@ export function LayoutInlineJS() {
 To run unit and integration tests on the source code:
 
 ```bash
-npm run test
+npm run test --coverage
 ```
 
 The respository is configured with [Vitest](https://vitest.dev/).

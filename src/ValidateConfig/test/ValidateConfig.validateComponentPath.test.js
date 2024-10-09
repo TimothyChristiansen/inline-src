@@ -10,11 +10,9 @@ describe("ValidateConfig", () => {
     })
 
     it("throws an error if the file for componentPath is not resolved", () => {
-        const errConfig = JSON.stringify(config);
         mockFs({
-            './inline-src.config.json' : `${errConfig}`,
             [config.inlineSource[0].assetPath] : 'placeholder'
         })
-        expect(() => ValidateConfig()).toThrow(`inline-src: Invalid config - File "./test_work/InlineSrc.ts" for "componentPath" at config index 0 does not exist.`);
+        expect(() => ValidateConfig(config)).toThrow(`inline-src: Invalid config - File "./test_work/InlineSrc.ts" for "componentPath" at config index 0 does not exist.`);
     })
 })

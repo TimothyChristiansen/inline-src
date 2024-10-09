@@ -34,34 +34,31 @@ describe("ValidateConfig", () => {
 
     it("throws an error if config inlineSource is undefined", () => {
         let {inlineSource, ...rest} = errConfig;
-        errConfig = JSON.stringify({...rest});
+        errConfig = {...rest};
         mockFs({
-            './inline-src.config.json' : `${errConfig}`,
             ...setupMocks
         })
-        expect(() => ValidateConfig()).toThrow(`inline-src: Config object for inlineSource is undefined.`);
+        expect(() => ValidateConfig(errConfig)).toThrow(`inline-src: Config object for inlineSource is undefined.`);
     })
 
     it("throws an error if config inlineSource is not an Array", () => {
         let {inlineSource, ...rest} = errConfig;
         inlineSource = {"not" : "an array"};
-        errConfig = JSON.stringify({inlineSource, ...rest});
+        errConfig = {inlineSource, ...rest};
         mockFs({
-            './inline-src.config.json' : `${errConfig}`,
             ...setupMocks
         })
-        expect(() => ValidateConfig()).toThrow(`inline-src: Config object for inlineSource is not an Array.`);
+        expect(() => ValidateConfig(errConfig)).toThrow(`inline-src: Config object for inlineSource is not an Array.`);
     })
 
     it("throws an error if config inlineSource has 0 length", () => {
         let {inlineSource, ...rest} = errConfig;
         inlineSource = [];
-        errConfig = JSON.stringify({inlineSource, ...rest});
+        errConfig = {inlineSource, ...rest};
         mockFs({
-            './inline-src.config.json' : `${errConfig}`,
             ...setupMocks
         })
-        expect(() => ValidateConfig()).toThrow(`inline-src: Config object for inlineSource has 0 length.`);
+        expect(() => ValidateConfig(errConfig)).toThrow(`inline-src: Config object for inlineSource has 0 length.`);
     })
 
     keys.forEach((key) => {
@@ -69,12 +66,11 @@ describe("ValidateConfig", () => {
             let {inlineSource, ...rest} = errConfig;
             let {[key] : removedKey, ...inlineSourceRest} = inlineSource[0];
             inlineSource[0] = {...inlineSourceRest};
-            errConfig = JSON.stringify({inlineSource, ...rest});
+            errConfig = {inlineSource, ...rest};
             mockFs({
-                './inline-src.config.json' : `${errConfig}`,
                 ...setupMocks
             })
-            expect(() => ValidateConfig()).toThrow(`inline-src: Invalid config - Missing key "${key}" at config index 0.`);
+            expect(() => ValidateConfig(errConfig)).toThrow(`inline-src: Invalid config - Missing key "${key}" at config index 0.`);
         })
     });
 })

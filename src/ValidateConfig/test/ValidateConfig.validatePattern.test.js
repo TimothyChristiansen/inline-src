@@ -16,11 +16,10 @@ describe("ValidateConfig", () => {
         inlineSource.splice(1);
         inlineSource[0].pattern = "[";
         errConfig = {inlineSource, ...rest}; 
-        errConfig = JSON.stringify(config);
         mockFs({
             './inline-src.config.json' : `${errConfig}`,
             ...setupMocks
         })
-        expect(() => ValidateConfig()).toThrow(`inline-src: Invalid config - Expression "[" for "pattern" at config index 0 is not a valid regular expression.`);
+        expect(() => ValidateConfig(errConfig)).toThrow(`inline-src: Invalid config - Expression "[" for "pattern" at config index 0 is not a valid regular expression.`);
     })
 })

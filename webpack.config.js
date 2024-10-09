@@ -3,7 +3,7 @@ const path = require('path');
 
 module.exports = {
   target: "node",  
-  entry: path.resolve(__dirname, 'src', 'inline-src-main.ts'),
+  entry: path.resolve(__dirname, 'src/inline-src', 'inline-src-main.ts'),
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'inline-src.js',
@@ -11,7 +11,7 @@ module.exports = {
   },
   optimization: {
     usedExports: false,
-    minimize: true,
+    minimize: false,
   },
   module: {
     rules: [

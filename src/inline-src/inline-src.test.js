@@ -11,13 +11,19 @@ function consoleTest(func, silent, message) {
 
     const spy = vi.spyOn(console, 'info').mockImplementation(() => {});
 
-    func(config);
+    if(silent) {
+        func(config);
+    } else {
+        func();
+    }
 
     if(silent === "true") {
         expect(spy).not.toHaveBeenCalled();
         
-    } else {
+    } else if (silent === "false") {
         expect(spy).toHaveBeenCalledWith(message);
+    } else {
+        expect(spy).not.toHaveBeenCalled();
     }                 
 
     spy.mockRestore();
@@ -69,6 +75,10 @@ describe("CleanupInlineSrc", () => {
 
     it("does not display the final console message if silent is true", () => {
         consoleTest(CleanupInlineSrc,'true');
+    })
+
+    it("does not display the final console message if no config is passed", () => {
+        consoleTest(CleanupInlineSrc);
     })
 })
 

@@ -13,9 +13,9 @@ export function InitInlineSrc(config : Config) : void {
     }
 }
 
-export function CleanupInlineSrc(config : Config) : void {
+export function CleanupInlineSrc(config? : Config) : void {
     fs.rmSync("./inline-src_work", { recursive: true, force: true });
-    if(config.silent !== true && config.silent !== "true") {
+    if(config && config.silent !== true && config.silent !== "true") {
         console.info("inline-src: Complete!");
     }
 }

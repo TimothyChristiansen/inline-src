@@ -1,5 +1,4 @@
 import {Config, InlineSource} from "../inline-src.config/inline-src.config.ts"
-import {FindConfig, LoadConfig} from "../ConfigUtils/ConfigUtils.ts"
 import * as fs from "fs"
 
 function validateAssetPath(config : Config, item : InlineSource, index : number) : void {
@@ -81,9 +80,7 @@ function validateInlineSource(config : Config) : void {
     }
 }
 
-export function ValidateConfig() : void {
-    const configFilePath = FindConfig();
-    const config = LoadConfig(configFilePath);
+export function ValidateConfig(config : Config) : void {
     validateInlineSource(config);
     config.inlineSource.forEach((item : InlineSource, index : number) => {
         validateInlineSourceKeys(config, item, index);

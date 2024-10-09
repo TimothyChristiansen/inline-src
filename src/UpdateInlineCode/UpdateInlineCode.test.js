@@ -102,7 +102,7 @@ describe('UpdateInlineCode', () => {
     it('throws an error if no match is found for the actual source code at item.componentPath', () => {
 
         expect(() => UpdateInlineCode(config, config.inlineSource[3], "css"))
-        .toThrow(`inline-src: The pattern associated with "componentPath" : "./test_work/InlineSrc4.ts" does not produce a match for the actual code found in the file.`);
+        .toThrow(`inline-src: \"pattern\" : \"return \`.*?\`;\\\\s*// End OtherInlineJS.\" and \"componentCode\" : \"return \`[inline-src_contents]\`;\\\\n                // End OtherInlineJS.\" values do not produce a match for the actual content found in \"componentPath\" : \"./test_work/InlineSrc4.ts\".`);
         
     })
 });

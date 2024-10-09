@@ -23,24 +23,20 @@ describe("ValidateConfig", () => {
         inlineSource.splice(1);
         inlineSource[0].componentCode = {};
         errConfig = {inlineSource, ...rest};
-        errConfig = JSON.stringify(errConfig);
         mockFs({
-            './inline-src.config.json' : `${errConfig}`,
             ...setupMocks
         })
-        expect(() => ValidateConfig()).toThrow(`inline-src: Invalid config - Invalid object found for "componentCode" at config index 0. Expected string but received [object Object].`);
+        expect(() => ValidateConfig(errConfig)).toThrow(`inline-src: Invalid config - Invalid object found for "componentCode" at config index 0. Expected string but received [object Object].`);
     })
 
-    it("throws an error if the componentCode is not a string", () => {
+    it("throws an error if the componentCode is missing the [inline-src_content] token", () => {
         let {inlineSource, ...rest} = errConfig;
         inlineSource.splice(1);
         inlineSource[0].componentCode = `inline-src_content token is missing!`;
         errConfig = {inlineSource, ...rest};
-        errConfig = JSON.stringify(errConfig);
         mockFs({
-            './inline-src.config.json' : `${errConfig}`,
             ...setupMocks
         })
-        expect(() => ValidateConfig()).toThrow(`inline-src: Invalid config - [inline-src_contents] token not found for "componentCode" at config index 0.`);
+        expect(() => ValidateConfig(errConfig)).toThrow(`inline-src: Invalid config - [inline-src_contents] token not found for "componentCode" at config index 0.`);
     })
 })
