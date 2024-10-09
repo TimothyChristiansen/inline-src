@@ -17,7 +17,7 @@ export const setupMocks = {
     }`
 }
 
-const keys = ["assetPath", "componentPath", "pattern", "componentCode"];
+const keys = ["assetPath", "componentPath", "componentCode"];
 
 describe("ValidateConfig", () => {
 
@@ -61,6 +61,20 @@ describe("ValidateConfig", () => {
         expect(() => ValidateConfig(errConfig)).toThrow(`inline-src: Config object for inlineSource has 0 length.`);
     })
 
+    it("throws an error if there is no match found between the supplied componentCode and the actual code in the target file at componentPath", () => {
+        mockFs({
+            [config.inlineSource[0].assetPath]: 'body {background: #000;color: #fff;}',
+            [config.inlineSource[0].componentPath]: `import * as fs  from "fs"
+            export default function ThisComponent({someProps} : any) {
+                const foo = "bar";
+                return \`\`;
+                // End ThisIsAMismatch!
+            }`
+        })
+        expect(() => ValidateConfig(errConfig)).toThrow(`inline-src: No match found for "return \`[inline-src_contents]\`;
+                // End MyComponentInlineCSS." in "./test_work/InlineSrc.ts" at inlineSource index 0.`);
+    })
+ 
     keys.forEach((key) => {
         it(`throws an error if config.inlineSource.${key} is missing`, () => {
             let {inlineSource, ...rest} = errConfig;

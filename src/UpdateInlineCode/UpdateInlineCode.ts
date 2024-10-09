@@ -1,35 +1,32 @@
 import {Config, InlineSource} from "../inline-src.config/inline-src.config.ts"
 import * as fs from "fs"
-import {CleanupInlineSrc} from "../inline-src/inline-src.ts"
 
 type MinType = "css" | "js";
+
+function tokenReplace(componentPathCode : string, componentCode : string, minifiedFile : string) {
+
+    const token = "[inline-src_contents]";
+
+    const replacer = componentCode.replace(token, minifiedFile);
+
+    const regex = new RegExp(componentCode.replace(token,".*?").replace(/\s{2,}/g,"\\s*"));
+
+    const modified = componentPathCode.replace(regex,replacer);
+
+    return modified;
+
+}
 
 export default function UpdateInlineCode(config : Config, item : InlineSource, minType : MinType) {
 
     const minifiedFile = fs.readFileSync(`./inline-src_work/file.min.${minType}`).toString().replaceAll("`", "\\\`");
 
-    const regex = new RegExp(item.pattern,'g');
+    let componentPathCode = fs.readFileSync(item.componentPath).toString();
 
-    const componentCodeMatch = item.componentCode.replace(/\\n/g, "\n").replace(/\\t/g, "\t").replace(/\\\\/g, "\\").match(regex);
-
-    if(!componentCodeMatch) {
-        CleanupInlineSrc();
-        throw new Error(`inline-src: The pattern associated with "componentPath" : "${item.componentPath}" does not produce a match for "componentCode" : "${item.componentCode}".`);
-    }
-
-    let componentCodeWithNewlines = componentCodeMatch[0].replace('[inline-src_contents]', minifiedFile);
-
-    let inlineFileContents = fs.readFileSync(item.componentPath).toString();
-
-    if(!inlineFileContents.match(regex)) {
-        CleanupInlineSrc();
-        throw new Error(`inline-src: "pattern" : ${JSON.stringify(item.pattern)} and "componentCode" : ${JSON.stringify(item.componentCode)} values do not produce a match for the actual content found in "componentPath" : ${JSON.stringify(item.componentPath)}.`);
-    }
-
-    inlineFileContents = inlineFileContents.replace(regex, componentCodeWithNewlines);
+    componentPathCode = tokenReplace(componentPathCode, item.componentCode, minifiedFile);
 
     if(config.silent !== true && config.silent !== "true") {
-        console.info(`inline-src: Placing minified ${item.assetPath} into ${item.componentPath} at specified pattern...`);
+        console.info(`inline-src: Placing minified ${item.assetPath} into ${item.componentPath} at specified position...`);
     }
-    fs.writeFileSync(item.componentPath,inlineFileContents);
-}
+    fs.writeFileSync(item.componentPath,componentPathCode);
+} 

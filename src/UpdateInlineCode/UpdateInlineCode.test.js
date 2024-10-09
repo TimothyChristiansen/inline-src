@@ -49,7 +49,7 @@ describe('UpdateInlineCode', () => {
                 // End LayoutInlineJS.
             }`
 
-    it('locates and replaces contents of file based on regex pattern when file type is "css"', () => {
+    it('locates and replaces contents of file based when file type is "css"', () => {
 
         UpdateInlineCode(config, config.inlineSource[0], "css");
 
@@ -57,7 +57,7 @@ describe('UpdateInlineCode', () => {
         expect(result).toBe(cssComponentContents);
     })
 
-    it('locates and replaces contents of file based on regex pattern when file type is "js"', () => {
+    it('locates and replaces contents of file when file type is "js"', () => {
 
         UpdateInlineCode(config, config.inlineSource[2], "js");
 
@@ -73,7 +73,7 @@ describe('UpdateInlineCode', () => {
 
         UpdateInlineCode(config, config.inlineSource[0], "css");
 
-        expect(spy).toHaveBeenCalledWith('inline-src: Placing minified ./test_work/globals.scss into ./test_work/InlineSrc.ts at specified pattern...');
+        expect(spy).toHaveBeenCalledWith('inline-src: Placing minified ./test_work/globals.scss into ./test_work/InlineSrc.ts at specified position...');
 
         spy.mockRestore();
     })
@@ -89,20 +89,5 @@ describe('UpdateInlineCode', () => {
         expect(spy).toBeCalledTimes(0);
 
         spy.mockRestore();
-    })
-
-    it('throws an error if no match is found for item.componentCode', () => {
-
-        config.inlineSource[0].componentCode = "IncorrectComponentCode";
-
-        expect(() => UpdateInlineCode(config, config.inlineSource[0], "css"))
-        .toThrow(`inline-src: The pattern associated with "componentPath" : "./test_work/InlineSrc.ts" does not produce a match for "componentCode" : "IncorrectComponentCode"`);
-    })
-
-    it('throws an error if no match is found for the actual source code at item.componentPath', () => {
-
-        expect(() => UpdateInlineCode(config, config.inlineSource[3], "css"))
-        .toThrow(`inline-src: \"pattern\" : \"return \`.*?\`;\\\\s*// End OtherInlineJS.\" and \"componentCode\" : \"return \`[inline-src_contents]\`;\\\\n                // End OtherInlineJS.\" values do not produce a match for the actual content found in \"componentPath\" : \"./test_work/InlineSrc4.ts\".`);
-        
     })
 });

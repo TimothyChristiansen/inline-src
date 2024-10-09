@@ -51,7 +51,9 @@ You can also run `npx inline-src` to directly invoke the automatic injection of 
 
 ## Config
 
-A valid config file must be present at `./inline-src.config` with file extension .json, .js, .mjs, .ts, or .mts. 
+A valid config file must be present at `./inline-src.config` with file extension .json, .js, .mjs, or .cjs.
+
+The config file is discovered and parsed via [lilconfig]https://www.npmjs.com/package/lilconfig) which is a more lightweight, dependency-free version of `cosmiconfig`.
 
 ### Config Structure
 
@@ -65,8 +67,7 @@ Example:
         {
             "assetPath" : "./inline-src/styles/globals.scss",
             "componentPath" : "./components/InlineSrc/InlineSrc.ts",
-            "pattern" : "return `.*?`;\\s*\/\/ End GlobalInlineStyle.",
-            "componentCode" : "return `[inline-src_contents]`;\\n    // End GlobalInlineStyle."
+            "componentCode" : "return `[inline-src_contents]`;\n    // End GlobalInlineStyle."
         }
         // More entries...
     ],
@@ -89,25 +90,16 @@ The relative path to the file where the inline content will be placed.
 
 Example: "./components/InlineSrc/InlineSrc.ts"
 
-`"pattern"`
-
-A regular expression that locates the exact position in componentPath where the minified content will be inserted.
-
-Example: 
-```js
-"return `.*?`;\\s*\/\/ End LayoutInlineJS."
-```
-
 `"componentCode"`
 
-The exact portion of the component to replace, with the token [inline-src_contents] serving as a placeholder for the minified content.
+The exact portion of the component to replace, with the token `[inline-src_contents]` serving as a placeholder for the minified content. If properly formatted with this token and any special character escape sequences, `inline-src` will convert this value for you into a servicable pattern to replace the token with the minified inline source from the binary asset associated with this item index.
 
 Example: 
 ```js
-"return `[inline-src_contents]`;\\n // End GlobalInlineStyle."
+"return `[inline-src_contents]`;\n // End GlobalInlineStyle."
 ```
 
-Note: Be aware of proper escape sequences for special characters including new line characters as illustrated above. It is also highly recommended to place [inline-src_contents], and therefore the output of the minified contents, inside a template literal with ` backticks surrounding the content, otherwise your minified code will have a high likelihood of sequence failure or corruption in use.
+It is also highly recommended to place [inline-src_contents], and therefore the output of the minified contents, inside a template literal with ` backticks surrounding the content, otherwise your minified code itself will have a high likelihood of sequence failure or corruption in use.
 
 `"uglifyConfig"`
 
@@ -135,19 +127,19 @@ Example of verbose output:
 inline-src: ./inline-src/styles/globals.scss - Compiling SASS...
 inline-src: Minifying working CSS file with minify-css...
 C:\Users\user\repos\project\inline-src_work\file.min.css 生成成功!
-inline-src: Placing minified ./inline-src/styles/globals.scss into ./components/InlineSrc/InlineSrc.ts at specified pattern...
+inline-src: Placing minified ./inline-src/styles/globals.scss into ./components/InlineSrc/InlineSrc.ts at specified position...
 inline-src: ./inline-src/styles/splitview.scss - Compiling SASS...
 inline-src: Minifying working CSS file with minify-css...
 C:\Users\user\repos\project\inline-src_work\file.min.css 生成成功!
-inline-src: Placing minified ./inline-src/styles/splitview.scss into ./components/InlineSrc/InlineSrc.ts at specified pattern...
+inline-src: Placing minified ./inline-src/styles/splitview.scss into ./components/InlineSrc/InlineSrc.ts at specified position...
 inline-src: Compiling ./inline-src/js/layout.ts via swc...
 Successfully compiled 1 file with swc.
 inline-src: Minifying working JS file with uglify-js...
-inline-src: Placing minified ./inline-src/js/layout.ts into ./components/InlineSrc/InlineSrc.ts at specified pattern...
+inline-src: Placing minified ./inline-src/js/layout.ts into ./components/InlineSrc/InlineSrc.ts at specified position...
 inline-src: Compiling ./inline-src/js/splitview.ts via swc...
 Successfully compiled 1 file with swc.
 inline-src: Minifying working JS file with uglify-js...
-inline-src: Placing minified ./inline-src/js/splitview.ts into ./components/InlineSrc/InlineSrc.ts at specified pattern...
+inline-src: Placing minified ./inline-src/js/splitview.ts into ./components/InlineSrc/InlineSrc.ts at specified position...
 inline-src: Complete!
 ```
 

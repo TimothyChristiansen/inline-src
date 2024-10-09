@@ -25,18 +25,6 @@ function validateComponentPath(item : InlineSource, index : number) : void {
     }
 }
 
-function validatePattern(item : InlineSource, index : number) : void {
-    let validRegex = true;
-    try {
-        new RegExp(item.pattern);
-    } catch(e) {
-        validRegex = false;
-    }
-    if(!validRegex) {
-        throw new Error(`inline-src: Invalid config - Expression "${item.pattern}" for "pattern" at config index ${index} is not a valid regular expression.`);
-    }
-}
-
 function validateComponentCode(item : InlineSource, index : number) : void {
     if(typeof item.componentCode !== "string") {
         throw new Error(`inline-src: Invalid config - Invalid object found for "componentCode" at config index ${index}. Expected string but received ${item.componentCode}.`);
@@ -46,8 +34,18 @@ function validateComponentCode(item : InlineSource, index : number) : void {
     }
 }
 
+function validateComponentCodeMatch(item : InlineSource, index : number) : void {
+    const contents = fs.readFileSync(item.componentPath).toString();
+    
+    const regex = new RegExp(item.componentCode.replace("[inline-src_contents]",".*?").replace(/\s{2,}/g,"\\s*"));
+
+    if(!contents.match(regex)) {
+        throw new Error(`inline-src: No match found for "${item.componentCode}" in "${item.componentPath}" at inlineSource index ${index}.`)
+    }
+}
+
 function validateInlineSourceKeys(config : Config, item : InlineSource, index : number) : void {
-    const keys = ["assetPath", "componentPath", "pattern", "componentCode"];
+    const keys = ["assetPath", "componentPath", "componentCode"];
     keys.forEach(key => {
         const Key = item[key as keyof InlineSource];
         if(Key === undefined) {
@@ -86,10 +84,9 @@ export function ValidateConfig(config : Config) : void {
         validateInlineSourceKeys(config, item, index);
         validateAssetPath(config, item, index);
         validateComponentPath(item, index);
-        validatePattern(item, index);
         validateComponentCode(item, index);
+        validateComponentCodeMatch(item, index);
         validateUglifyConfigPerItem(item, index);
-        
     });
     validateUglifyConfigDefault(config);
 }
