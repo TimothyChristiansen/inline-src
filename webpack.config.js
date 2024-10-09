@@ -7,7 +7,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'inline-src.js',
-    libraryTarget: 'commonjs2' // For Node.js environments
+    libraryTarget: 'commonjs2'
   },
   optimization: {
     usedExports: false,

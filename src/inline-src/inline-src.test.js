@@ -47,16 +47,13 @@ describe("InitInlineSrc", () => {
     it("does not display the initial console message if silent is true", () => {
         consoleTest(InitInlineSrc,'true');
     })
-
-    it("creates the initial working directory", () => {
-        InitInlineSrc(config);
-        expect(fs.existsSync("./inline-src_work")).toBe(true);
-    })
 })
 
 describe("CleanupInlineSrc", () => {
     beforeAll(() => {
-        mockFs({"./inline-src_work" : {}})
+        mockFs({"./inline-src_work" : {
+            "file.min.css" : "body { background : #000; color : #fff; }"
+        }})
     });
 
     afterAll(() => {

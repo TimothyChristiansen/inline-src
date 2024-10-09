@@ -1,11 +1,11 @@
-import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest'
+import { describe, it, expect, beforeEach, afterAll, vi } from 'vitest'
 import mockFs from 'mock-fs'
 import UpdateInlineCode from './UpdateInlineCode.ts'
 import config from '../../inline-src.config.json'
 import * as fs from 'fs'
 
 describe('UpdateInlineCode', () => {
-    beforeAll(() => {
+    beforeEach(() => {
         mockFs({
             "./inline-src_work/file.min.css" : 'body {background: #000;color: #fff;}',
             "./inline-src_work/file.min.js" : 'console.log("hello world!);',
