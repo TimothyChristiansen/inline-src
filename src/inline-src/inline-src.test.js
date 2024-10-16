@@ -5,6 +5,7 @@ import * as ProcessInlineCSS from "../ProcessInlineCSS/ProcessInlineCSS"
 import * as ProcessInlineJS from "../ProcessInlineJS/ProcessInlineJS"
 import config from '../../inline-src.config.json'
 import * as fs from "fs"
+import _ from "lodash";
 
 function consoleTest(func, silent, message) {
     config.silent = silent;
@@ -27,6 +28,50 @@ function consoleTest(func, silent, message) {
     }                 
 
     spy.mockRestore();
+}
+
+function fileTypeTest(configIndex) {
+    let Config = _.cloneDeep(config);
+    Config.inlineSource = Config.inlineSource.splice(configIndex,1);
+    const spyCompileCSS = vi.spyOn(ProcessInlineCSS, 'CompileCSS').mockImplementation(() => {});
+    const spyMinifyCSS = vi.spyOn(ProcessInlineCSS, 'MinifyCSS').mockImplementation(() => {});
+    const spyCompileJS = vi.spyOn(ProcessInlineJS, 'CompileJS').mockImplementation(() => {});
+    const spyMinifyJS = vi.spyOn(ProcessInlineJS, 'MinifyJS').mockImplementation(() => {});
+    ProcessInlineCode(Config);
+
+    const cssExpects = () => {
+        expect(spyCompileCSS).toHaveBeenCalled(1);
+        expect(spyMinifyCSS).toHaveBeenCalled(1);
+        expect(spyCompileJS).not.toHaveBeenCalled();
+        expect(spyMinifyJS).not.toHaveBeenCalled();
+    }
+
+    const jsExpects = () => {
+        expect(spyCompileJS).toHaveBeenCalled(1);
+        expect(spyMinifyJS).toHaveBeenCalled(1);
+        expect(spyCompileCSS).not.toHaveBeenCalled();
+        expect(spyMinifyCSS).not.toHaveBeenCalled();
+    }
+
+    switch(configIndex) {
+        case 0:
+            cssExpects();
+            break;
+        case 1:
+            cssExpects();
+            break;
+        case 2:
+            jsExpects();
+            break;
+        case 3:
+            jsExpects();
+            break;
+        case 4:
+            cssExpects();
+            break;
+        default:
+            throw new Error(`configIndex ${configIndex} out of bounds for configured test suite.`)
+    }
 }
 
 describe("InitInlineSrc", () => {
@@ -92,27 +137,23 @@ describe("ProcessInlineCode", () => {
         vi.restoreAllMocks();
     });
 
-    it("calls the correct functions for CSS compilation when the inlineSource item's asset path is a CSS file", () => {
-        let Config = JSON.parse(JSON.stringify(config));
-        let {inlineSource, ...rest} = Config;
-        inlineSource.splice(1);
-        Config = {inlineSource, rest};
-        const spyCompileCSS = vi.spyOn(ProcessInlineCSS, 'CompileCSS').mockImplementation(() => {});
-        const spyMinifyCSS = vi.spyOn(ProcessInlineCSS, 'MinifyCSS').mockImplementation(() => {});
-        ProcessInlineCode(Config);
-        expect(spyCompileCSS).toHaveBeenCalled(1);
-        expect(spyMinifyCSS).toHaveBeenCalled(1);
+    it("calls the correct functions for CSS compilation when the inlineSource item's asset path is a .scss file", () => {
+        fileTypeTest(0);
     })
 
-    it("calls the correct functions for JS compilation when the inlineSource item's asset path is a JS file", () => {
-        let Config = JSON.parse(JSON.stringify(config));
-        let {inlineSource, ...rest} = Config;
-        inlineSource = inlineSource.splice(2,1);
-        Config = {inlineSource, rest};
-        const spyCompileJS = vi.spyOn(ProcessInlineJS, 'CompileJS').mockImplementation(() => {});
-        const spyMinifyJS = vi.spyOn(ProcessInlineJS, 'MinifyJS').mockImplementation(() => {});
-        ProcessInlineCode(Config);
-        expect(spyCompileJS).toHaveBeenCalled(1);
-        expect(spyMinifyJS).toHaveBeenCalled(1);
+    it("calls the correct functions for CSS compilation when the inlineSource item's asset path is a .css file", () => {
+        fileTypeTest(1);
+    })
+
+    it("calls the correct functions for CSS compilation when the inlineSource item's asset path is a .sass file", () => {
+        fileTypeTest(4);
+    })
+
+    it("calls the correct functions for JS compilation when the inlineSource item's asset path is a .ts file", () => {
+        fileTypeTest(2);
+    })
+
+    it("calls the correct functions for JS compilation when the inlineSource item's asset path is a .js file", () => {
+        fileTypeTest(3);
     })
 })

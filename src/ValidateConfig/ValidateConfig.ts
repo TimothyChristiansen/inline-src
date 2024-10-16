@@ -6,9 +6,9 @@ function validateAssetPath(config : Config, item : InlineSource, index : number)
         throw new Error(`inline-src: Invalid config - File "${item.assetPath}" for "assetPath" at config index ${index} does not exist.`);
     }
     const type = item.assetPath.substring(item.assetPath.lastIndexOf("."));
-    const validTypes = [".css", ".scss", ".js", ".mjs", ".ts", ".mts"];
+    const validTypes = [".css", ".scss", ".sass", ".js", ".mjs", ".ts", ".mts"];
     if(!validTypes.includes(type)) {
-        throw new Error(`inline-src: File "${item.assetPath}" at config index ${index} is not a valid compilable file type (.css, .scss, .js, .mjs, .ts, or .mts).`)
+        throw new Error(`inline-src: File "${item.assetPath}" at config index ${index} is not a valid compilable file type (.css, .scss, .sass, .js, .mjs, .ts, or .mts).`)
     }
     const jsTypes = [".js", ".mjs", ".ts", ".mts"];
     if(jsTypes.includes(type) && typeof config.swcrcPath === "undefined") {

@@ -19,6 +19,11 @@
             "assetPath" : "./test_work/other.ts",
             "componentPath" : "./test_work/InlineSrc4.ts",
             "componentCode" : "return `[inline-src_contents]`;\n                // End OtherInlineJS."
+        },
+        {
+            "assetPath" : "./test_work/another.sass",
+            "componentPath" : "./test_work/InlineSrc.ts",
+            "componentCode" : "return `[inline-src_contents]`;\n                // End MyIndentedSASSInlineCSS."
         }
     ],
     "swcrcPath": "./test_work/inline-src/.swcrc",

@@ -29,7 +29,7 @@ describe("ValidateConfig", () => {
         mockFs({
             [newPath] : "content"
         })
-        expect(() => ValidateConfig(errConfig)).toThrow(`inline-src: File "./test_work/invalid_extention.txt" at config index 0 is not a valid compilable file type (.css, .scss, .js, .mjs, .ts, or .mts).`);
+        expect(() => ValidateConfig(errConfig)).toThrow(`inline-src: File "./test_work/invalid_extention.txt" at config index 0 is not a valid compilable file type (.css, .scss, .sass, .js, .mjs, .ts, or .mts).`);
     })
 
     it("throws an error if the file type is js but the config for the swcrc path is undefined", () => {

@@ -34,7 +34,7 @@ export function ProcessInlineCode(config : Config) : void {
             processInlineJS(config, item);
             UpdateInlineCode(config, item, "js");
         }
-        if(extension.match(/\.s?css/g)) {
+        if(extension.match(/\.s?[ca]ss/g)) {
             processInlineCSS(config, item);
             UpdateInlineCode(config, item, "css");
         }
