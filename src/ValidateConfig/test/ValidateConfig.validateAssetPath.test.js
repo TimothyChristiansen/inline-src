@@ -2,15 +2,13 @@ import { describe, it, expect, afterAll, beforeEach } from 'vitest'
 import mockFs from 'mock-fs'
 import {ValidateConfig} from '../ValidateConfig.ts'
 import config from "../../../inline-src.config.json"
+import _ from "lodash";
 
-const Config = JSON.stringify(config);
+let errConfig;
 
 describe("ValidateConfig", () => {
-
-    let errConfig;
-
     beforeEach(() => {
-        errConfig = JSON.parse(Config);
+        errConfig = _.cloneDeep(config);
     })
 
     afterAll(() => {
@@ -22,20 +20,27 @@ describe("ValidateConfig", () => {
     })
 
     it("throws an error if the file for assetPath is not of a valid file type", () => {
-        let {inlineSource, ...rest} = errConfig;
-        const newPath = './test_work/invalid_extention.txt';
-        inlineSource[0].assetPath = newPath;
-        errConfig = {inlineSource, ...rest};
+        const newPath = './test_work/invalid_extension.txt';
+        errConfig.inlineSource[0].assetPath = newPath;
         mockFs({
             [newPath] : "content"
         })
-        expect(() => ValidateConfig(errConfig)).toThrow(`inline-src: File "./test_work/invalid_extention.txt" at config index 0 is not a valid compilable file type (.css, .scss, .sass, .js, .mjs, .ts, or .mts).`);
+        expect(() => ValidateConfig(errConfig)).toThrow(`inline-src: File "./test_work/invalid_extension.txt" at config index 0 is not a valid compilable file type (.css, .scss, .sass, .js, .mjs, .ts, or .mts).`);
+    })
+})
+
+describe("ValidateConfig", () => {
+
+    beforeEach(() => {
+        errConfig = _.cloneDeep(config);
+        errConfig.inlineSource = errConfig.inlineSource.splice(2,1);
+    })
+
+    afterAll(() => {
+        mockFs.restore();
     })
 
     it("throws an error if the file type is js but the config for the swcrc path is undefined", () => {
-        let {inlineSource, ...rest} = errConfig;
-        inlineSource = inlineSource.splice(2,1);
-        errConfig = {inlineSource, ...rest};
         let {swcrcPath, ...swcrcRest} = errConfig;
         errConfig = {...swcrcRest};
         mockFs({
@@ -45,22 +50,23 @@ describe("ValidateConfig", () => {
     })
 
     it("throws an error if the file type is js but the config for the swcrc path is unresolved", () => {
-        let {inlineSource, ...rest} = errConfig;
-        inlineSource = inlineSource.splice(2,1);
-        errConfig = {inlineSource, ...rest};
+        errConfig.swcrcPath = ".swcrc"
         mockFs({
             './test_work/layout.ts' : 'placeholder'
         })
         expect(() => ValidateConfig(errConfig)).toThrow(`inline-src: File "./test_work/layout.ts" at config index 0 is a TypeScript file, but path to .swcrc file from config was unresolved.`);
     })
 
-    it("throws an error if the file type is js but the config for the swcrc path is unresolved", () => {
-        let {inlineSource, ...rest} = errConfig;
-        inlineSource = inlineSource.splice(2,1);
-        errConfig = {inlineSource, ...rest};
+    it("does not throw an error if the file type is js and there is a resolved swcrc file", () => {
+        errConfig.swcrcPath = ".swcrc"
         mockFs({
-            './test_work/layout.ts' : 'placeholder'
+            './.swcrc' : 'real config tested in e2e test',
+            './test_work/layout.ts' : 'placeholder',
+            './test_work/InlineSrc3.ts' : `return \`\`;
+                            // End LayoutInlineJS.`
         })
-        expect(() => ValidateConfig(errConfig)).toThrow(`inline-src: File "./test_work/layout.ts" at config index 0 is a TypeScript file, but path to .swcrc file from config was unresolved.`);
+        expect(() => ValidateConfig(errConfig)).not.toThrow();
     })
+
+    /* Note: Only the existence of the .swcrc file is tested in unit tests because the full functionality and integration are tested in the e2e tests. */
 })

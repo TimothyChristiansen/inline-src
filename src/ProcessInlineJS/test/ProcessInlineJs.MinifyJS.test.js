@@ -1,8 +1,9 @@
-import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
+import { describe, it, expect, beforeAll, beforeEach, afterAll, vi } from 'vitest';
 import mockFs from 'mock-fs';
 import { GetUglifyConfig, MinifyJS } from '../ProcessInlineJS';
 import config from '../../../inline-src.config.json';
 import * as fs from 'fs';
+import _ from "lodash";
 
 function consoleTest(func, silent, message) {
     config.silent = silent;
@@ -21,20 +22,25 @@ function consoleTest(func, silent, message) {
 }
 
 describe("GetUglifyConfig", () => {
+
+    let errConfig;
+
+    beforeEach(() => {
+        errConfig = _.cloneDeep(config);
+    })
+
     it("returns the default config string if no alternative is defined", () => {
         expect(GetUglifyConfig(config, config.inlineSource[3])).toBe("--compress templates=false");
     })
 
     it("returns the path to the uglify config defined in the item when present", () => {
-        let Config = JSON.parse(JSON.stringify(config));
-        Config.inlineSource[3].uglifyConfig = "./inline-src/item3-uglify-config.js";
-        expect(GetUglifyConfig(Config, Config.inlineSource[3])).toBe("--config ./inline-src/item3-uglify-config.js");
+        errConfig.inlineSource[3].uglifyConfig = "./inline-src/item3-uglify-config.js";
+        expect(GetUglifyConfig(errConfig, errConfig.inlineSource[3])).toBe("--config ./inline-src/item3-uglify-config.js");
     })
 
     it("returns the path to the user-defined default uglify config present", () => {
-        let Config = JSON.parse(JSON.stringify(config));
-        Config.uglifyConfig = "./inline-src/uglify-config.js";
-        expect(GetUglifyConfig(Config, Config.inlineSource[3])).toBe("--config ./inline-src/uglify-config.js");
+        errConfig.uglifyConfig = "./inline-src/uglify-config.js";
+        expect(GetUglifyConfig(errConfig, errConfig.inlineSource[3])).toBe("--config ./inline-src/uglify-config.js");
     })
 })
 

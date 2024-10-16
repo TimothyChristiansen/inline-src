@@ -2,8 +2,7 @@ import { describe, it, expect, afterAll, beforeEach } from 'vitest'
 import mockFs from 'mock-fs'
 import {ValidateConfig} from '../ValidateConfig.ts'
 import config from "../../../inline-src.config.json"
-
-const Config = JSON.stringify(config);
+import _ from "lodash";
 
 let errConfig;
 
@@ -22,10 +21,8 @@ const keys = ["assetPath", "componentPath", "componentCode"];
 describe("ValidateConfig", () => {
 
     beforeEach(() => {
-        errConfig = JSON.parse(Config);    
-        let {inlineSource, ...rest} = errConfig;
-        inlineSource.splice(1);
-        errConfig = {inlineSource, ...rest}; 
+        errConfig = _.cloneDeep(config);
+        errConfig.inlineSource.splice(1);  
     })
 
     afterAll(() => {
@@ -42,9 +39,7 @@ describe("ValidateConfig", () => {
     })
 
     it("throws an error if config inlineSource is not an Array", () => {
-        let {inlineSource, ...rest} = errConfig;
-        inlineSource = {"not" : "an array"};
-        errConfig = {inlineSource, ...rest};
+        errConfig.inlineSource = {"not" : "an array"}
         mockFs({
             ...setupMocks
         })
@@ -52,9 +47,7 @@ describe("ValidateConfig", () => {
     })
 
     it("throws an error if config inlineSource has 0 length", () => {
-        let {inlineSource, ...rest} = errConfig;
-        inlineSource = [];
-        errConfig = {inlineSource, ...rest};
+        errConfig.inlineSource = [];
         mockFs({
             ...setupMocks
         })

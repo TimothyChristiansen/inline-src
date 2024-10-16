@@ -1,17 +1,23 @@
-import { describe, it, expect, afterAll, beforeEach } from 'vitest'
+import { describe, it, expect, afterAll, beforeAll, beforeEach } from 'vitest'
 import mockFs from 'mock-fs'
 import {ValidateConfig} from '../ValidateConfig.ts'
 import config from "../../../inline-src.config.json"
 import {setupMocks} from "./ValidateConfig.validateInlineSource.test.js";
-
-const Config = JSON.stringify(config);
+import _ from "lodash";
 
 describe("ValidateConfig", () => {
 
     let errConfig;
 
     beforeEach(() => {
-        errConfig = JSON.parse(Config);
+        errConfig = _.cloneDeep(config);
+        errConfig.inlineSource.splice(1);
+    })
+
+    beforeAll(() => {
+        mockFs({
+            ...setupMocks
+        })
     })
 
     afterAll(() => {
@@ -19,45 +25,24 @@ describe("ValidateConfig", () => {
     })
 
     it("throws an error if an item provides an unresolved path to an uglify config file", () => {
-        let {inlineSource, ...rest} = errConfig;
-        inlineSource[0].uglifyConfig = "/uglify-config-path-error";
-        errConfig = {inlineSource, ...rest};
-        mockFs({
-
-            ...setupMocks
-        })
+        errConfig.inlineSource[0].uglifyConfig = "/uglify-config-path-error";
         expect(() => ValidateConfig(errConfig)).toThrow(`inline-src: uglify-js config provided at inlineSource index 0, but file /uglify-config-path-error was not found.`);
     })
 
-
     it("throws an error if an item provides an unresolved path to an uglify config file", () => {
-        let {inlineSource, ...rest} = errConfig;
-        inlineSource.splice(1);
-        inlineSource[0].uglifyConfig = undefined;
-        errConfig = {inlineSource, ...rest};
-        mockFs({
-            ...setupMocks
-        })
+        errConfig.inlineSource[0].uglifyConfig = undefined;
         expect(() => ValidateConfig(errConfig)).not.toThrow();
     })
 
     it("throws an error if a default uglify config file is specified at an uresolved path", () => {
-        let {inlineSource, ...rest} = errConfig;
-        inlineSource.splice(1);
-        errConfig = {inlineSource, ...rest, uglifyConfig : "/uglify-config-path-error"};
-        mockFs({
-            ...setupMocks
-        })
+        errConfig.uglifyConfig = "/uglify-config-path-error";
         expect(() => ValidateConfig(errConfig)).toThrow(`inline-src: uglify-js config provided for default configuration, but file "/uglify-config-path-error" was not found.`);
     })
 
     it("does not throw an error if config.uglifyConfig is undefined", () => {
-        let {inlineSource, ...rest} = errConfig;
-        inlineSource.splice(1);
-        errConfig = {inlineSource, ...rest, uglifyConfig : undefined};
-        mockFs({
-            ...setupMocks
-        })
+        errConfig.uglifyConfig = undefined;
         expect(() => ValidateConfig(errConfig)).not.toThrow();
     });
+
+    /* Note that positive tests for user supplied uglify configs are handled in e2e tests, not unit tests. */
 })
