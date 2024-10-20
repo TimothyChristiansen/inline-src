@@ -7,7 +7,7 @@ export default defineConfig({
     coverage: {
       provider: 'istanbul',
       reportsDirectory: './coverage',
-      exclude: ['src/inline-src/inline-src-main.ts', ...coverageConfigDefaults.exclude]
+      exclude: ['src/inline-src/inline-src-loader.js', ...coverageConfigDefaults.exclude]
     }
   },
 });

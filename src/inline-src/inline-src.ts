@@ -1,42 +1,37 @@
-import {Config, InlineSource} from "../inline-src.config/inline-src.config.ts"
-import {CompileCSS, MinifyCSS} from "../ProcessInlineCSS/ProcessInlineCSS.ts"
-import {CompileJS, MinifyJS} from "../ProcessInlineJS/ProcessInlineJS.ts"
-import UpdateInlineCode from "../UpdateInlineCode/UpdateInlineCode.ts"
-import * as fs from "fs"
+import {ValidateConfig} from "../ValidateConfig/ValidateConfig.ts"
+import {InitInlineSrc, ProcessInlineCode, CleanupInlineSrc} from "./inline-src-utils.ts"
+import {lilconfig} from "lilconfig";
 
-export function InitInlineSrc(config : Config) : void {
-    if(config.silent !== true && config.silent !== "true") {
-        console.info("inline-src: Initializing...");
-    }
-}
+export function InlineSrc() {
 
-export function CleanupInlineSrc(config? : Config) : void {
-    fs.rmSync("./inline-src_work", { recursive: true, force: true });
-    if(config && config.silent !== true && config.silent !== "true") {
-        console.info("inline-src: Complete!");
-    }
-}
+    const moduleName = "inline-src";
 
-export function ProcessInlineCode(config : Config) : void {
-    function processInlineCSS(config : Config, item : InlineSource) : void {
-        CompileCSS(config, item)
-        MinifyCSS(config, item);
-    }
-    
-    function processInlineJS(config : Config, item : InlineSource) : void {
-        CompileJS(config, item);
-        MinifyJS(config, item);
-    }
+    const explorer = lilconfig(moduleName, {searchPlaces : [
+        `${moduleName}.config.js`,
+        `${moduleName}.config.mjs`,
+        `${moduleName}.config.cjs`,
+        `${moduleName}.config.json`
+    ]});
 
-    config.inlineSource.forEach((item : InlineSource) => {
-        const extension = item.assetPath.substring(item.assetPath.lastIndexOf("."));
-        if(extension.match(/\.m?[jt]s/g)) {
-            processInlineJS(config, item);
-            UpdateInlineCode(config, item, "js");
+    explorer.search()
+    .then((result) => {
+        if(result && result.config) {
+            ValidateConfig(result.config);
+            InitInlineSrc(result.config);
+            ProcessInlineCode(result.config);
+            CleanupInlineSrc(result.config);
         }
-        if(extension.match(/\.s?[ca]ss/g)) {
-            processInlineCSS(config, item);
-            UpdateInlineCode(config, item, "css");
+        else if (result && result.isEmpty) {
+            throw Error('inline-src: Config file is empty.')
+        }
+        else if (!result || (result && !result.filepath)) {
+            throw Error('inline-src: Config file not found.')
+        }
+        else {
+            throw Error('inline-src: Unexpected error loading config file.')
         }
     })
+    .catch((error) => {
+        throw(error);
+    });
 }
