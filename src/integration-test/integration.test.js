@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, beforeEach, afterAll, vi } from 'vitest'
 import {InlineSrc} from "../inline-src/inline-src.ts"
 import * as ValidateConfigFunc from "../ValidateConfig/ValidateConfig.ts"
-import * as InlineSrcFuncs from "../inline-src/inline-src-utils.ts"
+import * as InlineSrcFuncs from "../inline-src/inline-src-core.ts"
 import config from '../../inline-src.config.json'
 import _ from "lodash";
 

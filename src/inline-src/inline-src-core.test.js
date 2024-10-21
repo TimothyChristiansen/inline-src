@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest'
 import mockFs from 'mock-fs'
-import {InitInlineSrc, CleanupInlineSrc, ProcessInlineCode} from "./inline-src-utils"
+import {InitInlineSrc, CleanupInlineSrc, ProcessInlineCode} from "./inline-src-core"
 import * as ProcessInlineCSS from "../ProcessInlineCSS/ProcessInlineCSS"
 import * as ProcessInlineJS from "../ProcessInlineJS/ProcessInlineJS"
 import config from '../../inline-src.config.json'

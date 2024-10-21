@@ -1,5 +1,5 @@
 import {ValidateConfig} from "../ValidateConfig/ValidateConfig.ts"
-import {InitInlineSrc, ProcessInlineCode, CleanupInlineSrc} from "./inline-src-utils.ts"
+import {InitInlineSrc, ProcessInlineCode, CleanupInlineSrc} from "./inline-src-core.ts"
 import {lilconfig} from "lilconfig";
 
 export function InlineSrc() {
