@@ -13,8 +13,9 @@ export function InlineSrc() {
         `${moduleName}.config.json`
     ]});
 
-    explorer.search()
+    return explorer.search()
     .then((result) => {
+        console.log(result); 
         if(result && result.config) {
             ValidateConfig(result.config);
             InitInlineSrc(result.config);
@@ -27,6 +28,7 @@ export function InlineSrc() {
         else if (!result || (result && !result.filepath)) {
             throw Error('inline-src: Config file not found.')
         }
+        /* This line/branch cannot be adequately tested, and esbuild strips all comments, even !legal comments, to ignore it in code coverage from this position */
         else {
             throw Error('inline-src: Unexpected error loading config file.')
         }
