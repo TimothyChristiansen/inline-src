@@ -29,7 +29,7 @@ describe("ValidateConfig", () => {
         expect(() => ValidateConfig(errConfig)).toThrow(`inline-src: uglify-js config provided at inlineSource index 0, but file /uglify-config-path-error was not found.`);
     })
 
-    it("throws an error if an item provides an unresolved path to an uglify config file", () => {
+    it("does not throw an error if an item does not define an uglify config file", () => {
         errConfig.inlineSource[0].uglifyConfig = undefined;
         expect(() => ValidateConfig(errConfig)).not.toThrow();
     })
@@ -39,7 +39,7 @@ describe("ValidateConfig", () => {
         expect(() => ValidateConfig(errConfig)).toThrow(`inline-src: uglify-js config provided for default configuration, but file "/uglify-config-path-error" was not found.`);
     })
 
-    it("does not throw an error if config.uglifyConfig is undefined", () => {
+    it("does not throw an error if config.uglifyConfig is not defined", () => {
         errConfig.uglifyConfig = undefined;
         expect(() => ValidateConfig(errConfig)).not.toThrow();
     });

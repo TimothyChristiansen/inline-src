@@ -4,9 +4,10 @@ import {ValidateConfig} from '../ValidateConfig.ts'
 import config from "../../../inline-src.config.json"
 import _ from "lodash";
 
-let errConfig;
-
 describe("ValidateConfig", () => {
+
+    let errConfig;
+
     beforeEach(() => {
         errConfig = _.cloneDeep(config);
     })
@@ -27,20 +28,9 @@ describe("ValidateConfig", () => {
         })
         expect(() => ValidateConfig(errConfig)).toThrow(`inline-src: File "./test_work/invalid_extension.txt" at config index 0 is not a valid compilable file type (.css, .scss, .sass, .js, .mjs, .ts, or .mts).`);
     })
-})
-
-describe("ValidateConfig", () => {
-
-    beforeEach(() => {
-        errConfig = _.cloneDeep(config);
-        errConfig.inlineSource = errConfig.inlineSource.splice(2,1);
-    })
-
-    afterAll(() => {
-        mockFs.restore();
-    })
 
     it("throws an error if the file type is js but the config for the swcrc path is undefined", () => {
+        errConfig.inlineSource = errConfig.inlineSource.splice(2,1);
         let {swcrcPath, ...swcrcRest} = errConfig;
         errConfig = {...swcrcRest};
         mockFs({
@@ -50,6 +40,7 @@ describe("ValidateConfig", () => {
     })
 
     it("throws an error if the file type is js but the config for the swcrc path is unresolved", () => {
+        errConfig.inlineSource = errConfig.inlineSource.splice(2,1);
         errConfig.swcrcPath = ".swcrc"
         mockFs({
             './test_work/layout.ts' : 'placeholder'
@@ -58,6 +49,7 @@ describe("ValidateConfig", () => {
     })
 
     it("does not throw an error if the file type is js and there is a resolved swcrc file", () => {
+        errConfig.inlineSource = errConfig.inlineSource.splice(2,1);
         errConfig.swcrcPath = ".swcrc"
         mockFs({
             './.swcrc' : 'real config tested in e2e test',
@@ -68,5 +60,5 @@ describe("ValidateConfig", () => {
         expect(() => ValidateConfig(errConfig)).not.toThrow();
     })
 
-    /* Note: Only the existence of the .swcrc file is tested in unit tests because the full functionality and integration are tested in the e2e tests. */
+    /* Note: Only the existence of the .swcrc file is tested in unit tests because the full functionality and integrations for swc are tested in the e2e tests. */
 })
