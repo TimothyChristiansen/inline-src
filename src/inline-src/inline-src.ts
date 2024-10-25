@@ -28,7 +28,8 @@ export function InlineSrc() {
         else if (!result || (result && !result.filepath)) {
             throw Error('inline-src: Config file not found.')
         }
-        /* This line/branch cannot be adequately tested, and esbuild strips all comments, even !legal comments, to ignore it in code coverage from this position */
+        /* The below line/branch cannot be adequately tested, as it is specifically intended to catch "unexpected" errors, and the branches above catch all known errors.
+           esbuild also strips all comments, even !legal comments, to ignore it in code coverage from this position */
         else {
             throw Error('inline-src: Unexpected error loading config file.')
         }
